@@ -5,60 +5,78 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rialo — Community Task Board</title>
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--accent:#6b46c1;--muted:#94a3b8;--good:#16a34a;--danger:#ef4444}
+    :root{--bg:#071025;--card:#071827;--accent:#6b46c1;--accent-2:#8b5cf6;--muted:#94a3b8;--glass:rgba(255,255,255,0.03);--good:#16a34a}
     *{box-sizing:border-box}
-    body{font-family:Inter, system-ui, Arial; margin:0; background:linear-gradient(180deg,#071025 0%,#04101a 100%); color:#e6eef8; min-height:100vh; padding:28px}
-    .wrap{max-width:980px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    body{font-family:Inter, system-ui, Arial; margin:0; background:linear-gradient(180deg,#04101a 0%,#071025 100%); color:#e6eef8; min-height:100vh; padding:28px}
+    .wrap{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 20px rgba(107,70,193,0.18)}
+    .logo svg{width:36px;height:36px}
     h1{font-size:20px;margin:0}
     .sub{color:var(--muted);font-size:13px}
     .top-actions{display:flex;gap:8px}
-    button, .btn{background:var(--accent);color:white;border:0;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:600}
-    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
-    .board{display:grid;grid-template-columns:1fr 360px;gap:16px}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:0;padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .board{display:grid;grid-template-columns:1fr 380px;gap:18px}
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
     .filters{display:flex;gap:8px;margin-bottom:12px}
-    .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted);font-size:13px;cursor:pointer}
-    .chip.active{background:linear-gradient(90deg,var(--accent),#8b5cf6);color:white}
+    .chip{padding:8px 10px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);font-size:13px;cursor:pointer}
+    .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
 
-    .task-list{display:flex;flex-direction:column;gap:8px}
-    .task{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-    .task .left{display:flex;gap:12px;align-items:center}
-    .badge{font-size:12px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted)}
-    .task .title{font-weight:600}
-    .task .meta{font-size:12px;color:var(--muted)}
+    .task-list{display:flex;flex-direction:column;gap:10px}
+    .task{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .task .left{display:flex;gap:14px;align-items:center}
+    .badge{font-size:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);text-transform:capitalize}
+    .task .title{font-weight:700}
+    .task .meta{font-size:13px;color:var(--muted)}
 
-    .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
-    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);width:0%}
+    .progress{height:14px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
 
     .small{font-size:13px;color:var(--muted)}
 
-    .add-form{display:flex;flex-direction:column;gap:8px}
-    input[type=text], select, textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .add-form{display:flex;flex-direction:column;gap:10px}
+    input[type=text], select, textarea{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
 
-    .right-col{display:flex;flex-direction:column;gap:12px}
+    .right-col{display:flex;flex-direction:column;gap:14px}
     .stats{display:flex;gap:12px}
-    .stat{flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);text-align:center}
+    .stat{flex:1;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));text-align:center}
     .muted{color:var(--muted)}
+
+    .eng-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+    .meter{width:160px;height:160px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent);border:6px solid rgba(255,255,255,0.02)}
+    .meter .val{font-weight:800;font-size:22px}
+
+    .quiz-list{display:flex;flex-direction:column;gap:8px}
+    .quiz{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .quiz button{margin-top:8px}
 
     footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
 
-    @media(max-width:900px){.board{grid-template-columns:1fr;}
-      .right-col{order:2}
-    }
+    @media(max-width:980px){.board{grid-template-columns:1fr;}.right-col{order:2}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div>
-        <h1>Rialo — Community Task Board</h1>
-        <div class="sub">Weekly tasks • track completion • aim for roles like @RialORBIT</div>
+      <div class="brand">
+        <div class="logo" aria-hidden>
+          <!-- Simple planet logo SVG as placeholder for Rialo -->
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="20" fill="white" opacity="0.95"/>
+            <path d="M6 40C18 28 46 24 58 12" stroke="#071025" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Rialo — Community Task Board</h1>
+          <div class="sub">Weekly tasks • track completion • proof for roles like @RialORBIT</div>
+        </div>
       </div>
       <div class="top-actions">
-        <button id="resetWeek" class="ghost">Reset Week</button>
-        <button id="exportBtn">Export JSON</button>
+        <button id="resetWeek" class="btn ghost">Reset Week</button>
+        <button id="exportBtn" class="btn">Export JSON</button>
       </div>
     </header>
 
@@ -71,17 +89,20 @@
           <div class="chip" data-filter="challenge">Challenges</div>
         </div>
 
-        <div style="margin-bottom:12px;display:flex;gap:12px;align-items:center;justify-content:space-between">
-          <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="flex:1;margin-right:12px">
             <div class="small">Weekly Progress</div>
-            <div style="width:280px;margin-top:8px" class="progress"><i id="progressBar"></i></div>
+            <div style="width:100%;margin-top:8px" class="progress"><i id="progressBar" style="width:0%"></i></div>
           </div>
-          <div class="small" id="progressText">0 / 0 complete</div>
+          <div style="text-align:right">
+            <div class="small" id="progressText">0 / 0 complete</div>
+            <div class="small muted">Keep pushing to earn roles</div>
+          </div>
         </div>
 
         <div class="task-list" id="taskList"></div>
 
-        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:14px 0">
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:16px 0">
 
         <div>
           <div class="small" style="margin-bottom:8px">Add new task</div>
@@ -95,35 +116,58 @@
             </select>
             <textarea id="taskNotes" rows="2" placeholder="Notes or instructions (optional)"></textarea>
             <div style="display:flex;gap:8px">
-              <button id="addBtn" type="button">Add Task</button>
-              <button id="clearBtn" class="ghost" type="button">Clear All</button>
+              <button id="addBtn" type="button" class="btn">Add Task</button>
+              <button id="clearBtn" class="btn ghost" type="button">Clear All</button>
             </div>
           </form>
         </div>
       </section>
 
       <aside class="right-col">
-        <div class="card stat">
-          <div class="muted">Total Tasks</div>
-          <div id="totalTasks" style="font-weight:700;font-size:20px">0</div>
-        </div>
-
-        <div class="card" style="padding:12px">
-          <div class="muted">Quick filters</div>
-          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-            <button class="btn" id="showPending">Show Pending</button>
-            <button class="btn" id="showDone">Show Done</button>
-            <button class="ghost" id="focusClub">My Club Tasks</button>
+        <div class="card eng-card">
+          <div>
+            <div class="muted">X Engagement Calculator</div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <input id="inpViews" type="text" placeholder="Views" />
+              <input id="inpLikes" type="text" placeholder="Likes" />
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <input id="inpRTs" type="text" placeholder="Retweets" />
+              <input id="inpReplies" type="text" placeholder="Replies" />
+            </div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button id="calcEng" class="btn">Calculate</button>
+              <button id="saveEng" class="btn ghost">Save</button>
+            </div>
+            <div style="margin-top:10px">
+              <div class="small muted">Engagement formula: (Likes + RTs + Replies) ÷ Views × 100</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div class="meter"><div class="val" id="engVal">0%</div></div>
+            <div class="small muted">Progress to 10k views</div>
+            <div style="width:160px;margin-top:6px" class="progress"><i id="viewBar" style="width:0%"></i></div>
+            <div class="small" id="viewText">0 / 10000 views</div>
           </div>
         </div>
 
         <div class="card">
-          <div class="muted">Guide</div>
-          <ul style="margin:8px 0 0 16px;color:var(--muted);font-size:13px;line-height:1.5">
-            <li>Mark tasks complete by clicking the toggle.</li>
-            <li>Use "Reset Week" every Monday (manual) to start fresh.</li>
-            <li>Export JSON to share progress with mods for role proofs.</li>
-          </ul>
+          <div class="muted">Quick filters</div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn" id="showPending">Show Pending</button>
+            <button class="btn" id="showDone">Show Done</button>
+            <button class="btn ghost" id="focusClub">My Club Tasks</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="muted">Mini Quiz — Play & Earn Points</div>
+          <div class="quiz-list" id="quizList">
+            <!-- quiz injected here -->
+          </div>
+          <div style="margin-top:10px">
+            <div class="small muted">Complete the quiz and export your score to share with mods.</div>
+          </div>
         </div>
 
       </aside>
@@ -133,9 +177,10 @@
   </div>
 
   <script>
-    // Simple client-side Task Board
-    const STORAGE_KEY = 'rialo_tasks_v1';
+    // STORAGE KEY
+    const STORAGE_KEY = 'rialo_tasks_v2';
 
+    // sample tasks
     const sampleTasks = [
       {id: id(), title:'Post in #club-tasks (weekly brief)', type:'club', notes:'Follow weekly prompt and tag #club-tasks', done:false},
       {id: id(), title:'Join Saturday Raid', type:'raid', notes:'Be online at raid time and follow raid lead', done:false},
@@ -143,124 +188,150 @@
       {id: id(), title:'Boost a club post (share)', type:'club', notes:'Retweet and comment to push reach', done:false}
     ];
 
-    // Helpers
+    // helpers
     function id(){return 't_'+Math.random().toString(36).slice(2,9)}
-    function qs(sel){return document.querySelector(sel)}
-    function qsa(sel){return document.querySelectorAll(sel)}
+    function qs(s){return document.querySelector(s)}
+    function qsa(s){return document.querySelectorAll(s)}
 
-    // State
+    // state
     let tasks = load() || sampleTasks.slice();
     let activeFilter = 'all';
 
-    // DOM refs
+    // dom refs
     const taskList = qs('#taskList');
     const progressBar = qs('#progressBar');
     const progressText = qs('#progressText');
     const totalTasksEl = qs('#totalTasks');
 
+    // engagement refs
+    const inpViews = qs('#inpViews');
+    const inpLikes = qs('#inpLikes');
+    const inpRTs = qs('#inpRTs');
+    const inpReplies = qs('#inpReplies');
+    const engVal = qs('#engVal');
+    const viewBar = qs('#viewBar');
+    const viewText = qs('#viewText');
+
+    // quiz data
+    const quizQuestions = [
+      {q:'What role do you get after completing onboarding in #waiting-room?', opts:['@RialONE','@RialORBIT','@RialOPS'], a:0},
+      {q:'How many views needed to qualify for @RialORBIT?', opts:['1k','10k','100k'], a:1},
+      {q:'Which channel hosts weekly creator tasks?', opts:['#club-tasks','#general','#raids'], a:0}
+    ];
+
     function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))}
     function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')}catch(e){return null}}
 
     function render(){
-      // filter chips
-      qsa('.chip').forEach(ch=>{
-        ch.classList.toggle('active', ch.dataset.filter===activeFilter);
-      })
+      // chips
+      qsa('.chip').forEach(ch=>{ch.classList.toggle('active', ch.dataset.filter===activeFilter)})
 
-      // tasks
-      taskList.innerHTML = '';
-      const visible = tasks.filter(t=>{
-        if(activeFilter==='all') return true;
-        if(activeFilter==='club') return t.type==='club';
-        return t.type===activeFilter;
-      })
-
+      // list
+      taskList.innerHTML='';
+      const visible = tasks.filter(t=> activeFilter==='all' ? true : (activeFilter==='club'?t.type==='club':t.type===activeFilter));
       visible.forEach(t=>{
-        const el = document.createElement('div'); el.className='task';
-        el.innerHTML = `
+        const el=document.createElement('div'); el.className='task';
+        el.innerHTML=`
           <div class="left">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-              <input type="checkbox" ${t.done? 'checked':''} data-id="${t.id}" />
+            <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
+              <input type="checkbox" ${t.done?'checked':''} data-id="${t.id}" />
               <div>
-                <div class="title">${escapeHTML(t.title)}</div>
-                <div class="meta">${escapeHTML(t.notes||'')}</div>
+                <div class="title">${esc(t.title)}</div>
+                <div class="meta">${esc(t.notes||'')}</div>
               </div>
             </label>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <div class="badge">${t.type}</div>
-            <button class="ghost" data-del="${t.id}">Delete</button>
+            <button class="btn ghost" data-del="${t.id}">Delete</button>
           </div>
-        `
-        taskList.appendChild(el)
-      })
+        `;
+        taskList.appendChild(el);
+      });
 
       // stats
-      const total = tasks.length;
-      const done = tasks.filter(t=>t.done).length;
-      const pct = total===0?0:Math.round((done/total)*100);
-      progressBar.style.width = pct+'%';
+      const total = tasks.length; const done = tasks.filter(t=>t.done).length; const pct = total===0?0:Math.round((done/total)*100);
+      qs('#progressBar').style.width = pct+'%';
       progressText.textContent = `${done} / ${total} complete`;
-      totalTasksEl.textContent = total;
+      // total tasks element (create if missing)
+      if(!qs('#totalTasks')){
+        const stat = document.createElement('div'); stat.id='totalTasks'; stat.style.display='none'; document.body.appendChild(stat);
+      }
 
-      // add listeners
+      // listeners
       qsa('input[type=checkbox]').forEach(cb=>cb.onchange = toggleDone);
       qsa('[data-del]').forEach(btn=>btn.onclick = delTask);
     }
 
-    function escapeHTML(str){return (str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+    function esc(s){return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
 
-    // Events
+    // events
     qs('#addBtn').addEventListener('click', ()=>{
-      const title = qs('#taskTitle').value.trim();
-      const type = qs('#taskType').value;
-      const notes = qs('#taskNotes').value.trim();
-      if(!title) return alert('Please enter a task title');
-      const t = {id:id(), title, type, notes, done:false};
-      tasks.unshift(t);
-      save(); render();
-      qs('#addForm').reset();
-    })
+      const title = qs('#taskTitle').value.trim(); const type = qs('#taskType').value; const notes = qs('#taskNotes').value.trim();
+      if(!title) return alert('Enter a task title');
+      tasks.unshift({id:id(), title, type, notes, done:false}); save(); render(); qs('#addForm').reset();
+    });
+    qs('#clearBtn').addEventListener('click', ()=>{ if(!confirm('Clear ALL tasks?')) return; tasks=[]; save(); render(); });
+    function toggleDone(e){ const id=e.target.dataset.id; const t=tasks.find(x=>x.id===id); if(!t) return; t.done=e.target.checked; save(); render(); }
+    function delTask(e){ const id=e.target.dataset.del; tasks = tasks.filter(x=>x.id!==id); save(); render(); }
 
-    qs('#clearBtn').addEventListener('click', ()=>{
-      if(!confirm('Clear ALL tasks and start fresh?')) return;
-      tasks = [];
-      save(); render();
-    })
+    qsa('.chip').forEach(ch=>ch.onclick=()=>{ activeFilter=ch.dataset.filter; render(); });
+    qs('#showPending').onclick = ()=>{ activeFilter='all'; render(); tasks = tasks.filter(t=>!t.done).concat(tasks.filter(t=>t.done)); render(); }
+    qs('#showDone').onclick = ()=>{ activeFilter='all'; render(); tasks = tasks.filter(t=>t.done).concat(tasks.filter(t=>!t.done)); render(); }
+    qs('#focusClub').onclick = ()=>{ activeFilter='club'; render(); }
 
-    function toggleDone(e){
-      const id = e.target.dataset.id;
-      const t = tasks.find(x=>x.id===id); if(!t) return;
-      t.done = e.target.checked;
-      save(); render();
+    qs('#resetWeek').onclick = ()=>{ if(!confirm('Reset this week (mark all undone)?')) return; tasks = tasks.map(t=>({...t, done:false})); save(); render(); }
+    qs('#exportBtn').onclick = ()=>{ const dataStr = JSON.stringify(tasks, null,2); const blob = new Blob([dataStr], {type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_tasks.json'; a.click(); URL.revokeObjectURL(url); }
+
+    // Engagement calculation
+    qs('#calcEng').onclick = ()=>{
+      const views = Number((inpViews.value||'').toString().replaceAll(',',''))||0;
+      const likes = Number((inpLikes.value||'').toString().replaceAll(',',''))||0;
+      const rts = Number((inpRTs.value||'').toString().replaceAll(',',''))||0;
+      const replies = Number((inpReplies.value||'').toString().replaceAll(',',''))||0;
+      const eng = views>0? Math.round(((likes + rts + replies)/views)*10000)/100 : 0;
+      engVal.textContent = eng+'%';
+      // view progress
+      const pct = Math.min(100, Math.round((views/10000)*100));
+      viewBar.style.width = pct+'%';
+      viewText.textContent = `${views.toLocaleString()} / 10000 views`;
+      // store last calc in localStorage as quick proof
+      localStorage.setItem('rialo_last_eng', JSON.stringify({views,likes,rts,replies,eng,ts:Date.now()}));
     }
+    qs('#saveEng').onclick = ()=>{ const v = localStorage.getItem('rialo_last_eng'); if(!v) return alert('Please calculate engagement first'); const data=JSON.parse(v); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='engagement-proofs.json'; a.click(); URL.revokeObjectURL(url); }
 
-    function delTask(e){
-      const id = e.target.dataset.del;
-      tasks = tasks.filter(x=>x.id!==id);
-      save(); render();
+    // Quiz rendering + play
+    function renderQuiz(){
+      const container = qs('#quizList'); container.innerHTML='';
+      quizQuestions.forEach((q,i)=>{
+        const el = document.createElement('div'); el.className='quiz';
+        el.innerHTML = `<div style="font-weight:700">Q${i+1}. ${esc(q.q)}</div>`;
+        q.opts.forEach((opt,oi)=>{
+          const btn = document.createElement('button'); btn.className='btn ghost'; btn.style.display='block'; btn.style.marginTop='8px'; btn.textContent = opt;
+          btn.onclick = ()=>{ playAnswer(i,oi,btn); };
+          el.appendChild(btn);
+        });
+        container.appendChild(el);
+      });
+      // score area
+      const scoreWrap = document.createElement('div'); scoreWrap.style.marginTop='10px'; scoreWrap.innerHTML = `<div class="small muted">Your quiz score: <span id="quizScore">0</span> / ${quizQuestions.length}</div><div style="margin-top:6px"><button id="exportScore" class="btn">Export Score</button></div>`;
+      container.appendChild(scoreWrap);
+      qs('#exportScore').onclick = ()=>{ const score = Number(qs('#quizScore').textContent||0); const payload = {score, total:quizQuestions.length, ts:Date.now()}; const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_quiz_score.json'; a.click(); URL.revokeObjectURL(url); }
     }
-
-    qsa('.chip').forEach(ch=>ch.onclick = ()=>{activeFilter = ch.dataset.filter; render()})
-
-    qs('#showPending').onclick = ()=>{activeFilter='all'; render(); const pending = tasks.filter(t=>!t.done); tasks = pending.concat(tasks.filter(t=>t.done)); render()}
-    qs('#showDone').onclick = ()=>{activeFilter='all'; render(); const done = tasks.filter(t=>t.done); tasks = done.concat(tasks.filter(t=>!t.done)); render()}
-    qs('#focusClub').onclick = ()=>{activeFilter='club'; render()}
-
-    qs('#resetWeek').onclick = ()=>{
-      if(!confirm('Reset this week: mark all tasks as not done?')) return;
-      tasks = tasks.map(t=>({...t, done:false})); save(); render();
+    const answered = {};
+    function playAnswer(qIdx,optIdx,btn){
+      if(answered[qIdx]) return; // one attempt per question
+      const correct = quizQuestions[qIdx].a;
+      const container = btn.parentElement;
+      if(optIdx===correct){ btn.style.background='linear-gradient(90deg,var(--accent),var(--accent-2))'; btn.style.color='white'; answered[qIdx]=1; } else { btn.style.background='#ef4444'; btn.style.color='white'; answered[qIdx]=0; }
+      // disable siblings
+      Array.from(container.querySelectorAll('button')).forEach(b=>b.disabled=true);
+      updateQuizScore();
     }
-
-    qs('#exportBtn').onclick = ()=>{
-      const dataStr = JSON.stringify(tasks, null, 2);
-      const blob = new Blob([dataStr], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='rialo_tasks.json'; a.click(); URL.revokeObjectURL(url);
-    }
+    function updateQuizScore(){ const s = Object.values(answered).reduce((a,b)=>a+(b||0),0); if(qs('#quizScore')) qs('#quizScore').textContent = s; }
 
     // init
-    render();
+    render(); renderQuiz();
   </script>
 </body>
 </html>
