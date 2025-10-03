@@ -3,360 +3,176 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rialo — Community Task Board (Improved)</title>
-  <meta name="description" content="Task board to track #club-tasks, raids, and challenges. Engagement calculator, quiz, progress and export for Rialo creators." />
+  <title>Rialo — Community Task Board (Final Improved)</title>
   <style>
-    :root{--bg:#04101a;--card:#072233;--accent:#6b46c1;--accent-2:#8b5cf6;--muted:#9fb0c8;--glass:rgba(255,255,255,0.03);--ok:#16a34a;--danger:#ef4444}
+    :root{--bg:#04101a;--card:#072233;--accent:#6b46c1;--accent-2:#8b5cf6;--muted:#9fb0c8;--ok:#16a34a;--danger:#ef4444}
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{font-family:Inter, system-ui, Arial; margin:0; background:linear-gradient(180deg,#03101a 0%,#041827 100%); color:#e6eef8; min-height:100vh; padding:22px}
+    body{font-family:Inter, system-ui, Arial;margin:0;background:linear-gradient(180deg,#03101a 0%,#041827 100%);color:#e6eef8;min-height:100vh;padding:20px}
     .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
     .brand{display:flex;gap:14px;align-items:center}
-    .logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 8px 28px rgba(107,70,193,0.18)}
-    .logo svg{width:34px;height:34px}
+    .logo{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+    .logo svg{width:32px;height:32px}
     h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:13px}
-    .top-actions{display:flex;gap:10px}
-    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:0;padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:0;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;transition:opacity .2s}
+    .btn:hover{opacity:.9}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
     .board{display:grid;grid-template-columns:1fr 380px;gap:18px}
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .card{background:rgba(255,255,255,0.02);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05)}
     .filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-    .chip{padding:8px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);font-size:13px;cursor:pointer}
+    .chip{padding:6px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted);font-size:13px;cursor:pointer}
     .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
 
     .task-list{display:flex;flex-direction:column;gap:10px}
-    .task{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.008);border:1px solid rgba(255,255,255,0.02)}
-    .task .left{display:flex;gap:12px;align-items:center}
-    .badge{font-size:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);text-transform:capitalize}
-    .task .title{font-weight:700}
-    .task .meta{font-size:13px;color:var(--muted)}
+    .task{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.05)}
+    .task .title{font-weight:600}
+    .task .meta{font-size:12px;color:var(--muted)}
+    .badge{font-size:11px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05);color:var(--muted)}
 
-    .progress{height:14px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
-    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .5s ease}
+    .progress{height:12px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden}
+    .progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .4s}
 
-    .small{font-size:13px;color:var(--muted)}
+    .small{font-size:12px;color:var(--muted)}
 
-    .add-form{display:flex;flex-direction:column;gap:10px}
-    input[type=text], select, textarea{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .add-form{display:flex;flex-direction:column;gap:8px}
+    input,select,textarea{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:inherit}
 
     .right-col{display:flex;flex-direction:column;gap:14px}
-    .stats{display:flex;gap:12px}
-    .stat{flex:1;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));text-align:center}
-    .muted{color:var(--muted)}
-
     .eng-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-    .meter{width:150px;height:150px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:6px solid rgba(255,255,255,0.02)}
-    .meter .val{font-weight:800;font-size:18px}
+    .meter{width:120px;height:120px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:4px solid rgba(255,255,255,0.05)}
+    .meter .val{font-weight:700;font-size:16px}
 
-    .quiz-list{display:flex;flex-direction:column;gap:8px}
-    .quiz{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .quiz .q{font-weight:600;margin-bottom:6px}
+    .quiz button{margin-top:6px;width:100%}
 
-    .toast{position:fixed;right:18px;bottom:18px;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:10px 14px;border-radius:10px;color:white;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:none}
+    .toast{position:fixed;bottom:20px;right:20px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;display:none}
 
-    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
-
-    @media(max-width:980px){.board{grid-template-columns:1fr;}.right-col{order:2}}
+    @media(max-width:900px){.board{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden>
-          <!-- Rialo styled planet logo -->
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="20" fill="white" opacity="0.95"/>
-            <path d="M8 38C20 26 44 22 56 10" stroke="#071025" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <div class="logo"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="white" opacity="0.9"/></svg></div>
         <div>
           <h1>Rialo — Community Task Board</h1>
-          <div class="sub">Weekly tasks • progress to roles • engagement proofs</div>
+          <div class="sub">Tasks • Engagement • Quiz • Role proofs</div>
         </div>
       </div>
       <div class="top-actions">
-        <button id="helpBtn" class="btn ghost">How it works</button>
+        <button id="helpBtn" class="btn ghost">Help</button>
         <button id="resetWeek" class="btn ghost">Reset Week</button>
         <button id="exportBtn" class="btn">Export JSON</button>
       </div>
     </header>
 
     <main class="board">
-      <section class="card" aria-labelledby="tasks-heading">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div>
-            <div id="tasks-heading" class="small">Tasks</div>
-            <div style="font-weight:700;font-size:18px">Weekly Task Board</div>
+            <div class="small">Weekly Task Board</div>
+            <div style="font-weight:700">Progress & Tasks</div>
           </div>
-          <div style="text-align:right">
-            <div class="small muted">Total</div>
-            <div id="totalTasks" style="font-weight:800;font-size:18px">0</div>
+          <div class="small" id="progressText">0 / 0 complete</div>
+        </div>
+        <div class="filters">
+          <div class="chip active" data-filter="all">All</div>
+          <div class="chip" data-filter="club">#club-tasks</div>
+          <div class="chip" data-filter="raid">Raids</div>
+          <div class="chip" data-filter="challenge">Challenges</div>
+        </div>
+        <div class="progress"><i id="progressBar"></i></div>
+        <div id="taskList" class="task-list"></div>
+        <hr style="margin:14px 0;border:none;height:1px;background:rgba(255,255,255,0.08)">
+        <form id="addForm" class="add-form" onsubmit="return false;">
+          <input id="taskTitle" type="text" placeholder="Task title" required>
+          <select id="taskType">
+            <option value="club">#club-tasks</option>
+            <option value="raid">Raids</option>
+            <option value="challenge">Challenges</option>
+            <option value="other">Other</option>
+          </select>
+          <textarea id="taskNotes" rows="2" placeholder="Notes (optional)"></textarea>
+          <div style="display:flex;gap:8px">
+            <button id="addBtn" class="btn">Add</button>
+            <button id="clearBtn" class="btn ghost">Clear</button>
           </div>
-        </div>
-
-        <div class="filters" role="tablist" aria-label="Task Filters">
-          <button class="chip active" data-filter="all">All</button>
-          <button class="chip" data-filter="club">#club-tasks</button>
-          <button class="chip" data-filter="raid">Raids</button>
-          <button class="chip" data-filter="challenge">Challenges</button>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="flex:1;margin-right:12px">
-            <div class="small">Weekly Progress</div>
-            <div style="width:100%;margin-top:8px" class="progress" aria-hidden><i id="progressBar"></i></div>
-          </div>
-          <div style="text-align:right">
-            <div class="small" id="progressText">0 / 0 complete</div>
-            <div class="small muted">Complete tasks to prove work for mods</div>
-          </div>
-        </div>
-
-        <div id="taskList" class="task-list" aria-live="polite"></div>
-
-        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:16px 0">
-
-        <div>
-          <div class="small" style="margin-bottom:8px">Add new task</div>
-          <form id="addForm" class="add-form" onsubmit="return false;" aria-label="Add task form">
-            <input id="taskTitle" type="text" placeholder="Task title (e.g. Create club post)" required aria-required="true" />
-            <select id="taskType" aria-label="Task type">
-              <option value="club">#club-tasks</option>
-              <option value="raid">Raids</option>
-              <option value="challenge">Challenges</option>
-              <option value="other">Other</option>
-            </select>
-            <textarea id="taskNotes" rows="2" placeholder="Notes or instructions (optional)"></textarea>
-            <div style="display:flex;gap:8px">
-              <button id="addBtn" type="button" class="btn">Add Task</button>
-              <button id="clearBtn" class="btn ghost" type="button">Clear All</button>
-            </div>
-          </form>
-        </div>
+        </form>
       </section>
 
-      <aside class="right-col" aria-labelledby="right-col-heading">
+      <aside class="right-col">
         <div class="card eng-card">
           <div>
-            <div class="muted">X Engagement Calculator</div>
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <input id="inpViews" type="text" placeholder="Views (e.g. 12500)" aria-label="Views" />
-              <input id="inpLikes" type="text" placeholder="Likes" aria-label="Likes" />
-            </div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <input id="inpRTs" type="text" placeholder="Retweets" aria-label="Retweets" />
-              <input id="inpReplies" type="text" placeholder="Replies" aria-label="Replies" />
-            </div>
-            <div style="margin-top:10px;display:flex;gap:8px">
+            <div class="small">X Engagement Calculator</div>
+            <input id="xHandle" type="text" placeholder="Your X handle (@username)" style="margin:6px 0;width:100%">
+            <input id="inpViews" type="text" placeholder="Views">
+            <input id="inpLikes" type="text" placeholder="Likes">
+            <input id="inpRTs" type="text" placeholder="Retweets">
+            <input id="inpReplies" type="text" placeholder="Replies">
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
               <button id="calcEng" class="btn">Calculate</button>
-              <button id="saveEng" class="btn ghost">Save Result</button>
+              <button id="saveEng" class="btn ghost">Save</button>
               <button id="resetEng" class="btn ghost">Reset</button>
             </div>
-            <div style="margin-top:10px">
-              <div class="small muted">Engagement formula: (Likes + RTs + Replies) ÷ Views × 100</div>
-            </div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-            <div class="meter" aria-hidden><div class="val" id="engVal">0%</div></div>
-            <div class="small muted">Progress to 10k views</div>
-            <div style="width:160px;margin-top:6px" class="progress"><i id="viewBar" style="width:0%"></i></div>
-            <div class="small" id="viewText">0 / 10000 views</div>
+          <div style="text-align:center">
+            <div class="meter"><div class="val" id="engVal">0%</div></div>
+            <div class="small">Views progress</div>
+            <div class="progress"><i id="viewBar"></i></div>
+            <div class="small" id="viewText">0 / 10000</div>
           </div>
         </div>
 
         <div class="card">
-          <div class="muted">Quick filters</div>
-          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-            <button class="btn" id="showPending">Show Pending</button>
-            <button class="btn" id="showDone">Show Done</button>
-            <button class="btn ghost" id="focusClub">My Club Tasks</button>
-          </div>
+          <div class="small">Mini Quiz</div>
+          <div id="quizList"></div>
+          <div class="small" style="margin-top:6px">Export score after completing</div>
         </div>
-
-        <div class="card" id="quizCard">
-          <div class="muted">Mini Quiz — Play & Earn Points</div>
-          <div class="quiz-list" id="quizList" aria-live="polite"></div>
-          <div style="margin-top:10px">
-            <div class="small muted">Complete the quiz & export your score for mods.</div>
-          </div>
-        </div>
-
       </aside>
     </main>
 
-    <footer>Built for Rialo • Data stored in your browser (localStorage). Reach out for backend sync (Firebase/Discord).</footer>
+    <footer style="margin-top:16px;font-size:12px;color:var(--muted);text-align:center">Built for Rialo • Data stored locally</footer>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast"></div>
 
   <script>
-    // Improved Task Board script
-    const STORAGE_KEY = 'rialo_tasks_v3';
-    const SAMPLE_KEY = 'rialo_seen_sample_v1';
+    const STORAGE_KEY='rialo_final_tasks';
+    let tasks=load()||[];let activeFilter='all';
+    const taskList=document.querySelector('#taskList'),progressBar=document.querySelector('#progressBar'),progressText=document.querySelector('#progressText');
 
-    const sampleTasks = [
-      {id: id(), title:'Post in #club-tasks (weekly brief)', type:'club', notes:'Follow weekly prompt and tag #club-tasks', done:false},
-      {id: id(), title:'Join Saturday Raid', type:'raid', notes:'Be online at raid time and follow raid lead', done:false},
-      {id: id(), title:'Create challenge entry', type:'challenge', notes:'Submit 1 unique meme for challenge', done:false},
-      {id: id(), title:'Boost a club post (share)', type:'club', notes:'Retweet and comment to push reach', done:false}
-    ];
-
-    // helpers
     function id(){return 't_'+Math.random().toString(36).slice(2,9)}
-    function qs(s){return document.querySelector(s)}
-    function qsa(s){return document.querySelectorAll(s)}
-    function toast(msg){ const t=qs('#toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none',3000); }
+    function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks))}
+    function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch(e){return null}}
+    function toast(msg){const t=document.querySelector('#toast');t.textContent=msg;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2500)}
 
-    // state
-    let tasks = load() || [];
-    if(!localStorage.getItem(SAMPLE_KEY)){
-      // first time visitor -> populate sample tasks
-      tasks = sampleTasks.slice();
-      localStorage.setItem(SAMPLE_KEY,'1');
-      save();
-    }
-    let activeFilter = 'all';
+    function render(){taskList.innerHTML='';const vis=tasks.filter(t=>activeFilter==='all'||t.type===activeFilter);vis.forEach(t=>{const el=document.createElement('div');el.className='task';el.innerHTML=`<div><div class="title">${t.title}</div><div class="meta">${t.notes||''}</div></div><div style="display:flex;gap:6px;align-items:center"><span class="badge">${t.type}</span><input type=checkbox ${t.done?'checked':''} data-id="${t.id}"/></div>`;taskList.appendChild(el)});const total=tasks.length,done=tasks.filter(t=>t.done).length;const pct=total?Math.round((done/total)*100):0;progressBar.style.width=pct+'%';progressText.textContent=`${done} / ${total} complete`;document.querySelectorAll('[data-id]').forEach(cb=>cb.onchange=e=>{const t=tasks.find(x=>x.id===e.target.dataset.id);t.done=e.target.checked;save();render()})}
 
-    // ui refs
-    const taskList = qs('#taskList'); const progressBar = qs('#progressBar'); const progressText = qs('#progressText'); const totalTasksEl = qs('#totalTasks');
-    const inpViews = qs('#inpViews'), inpLikes = qs('#inpLikes'), inpRTs = qs('#inpRTs'), inpReplies = qs('#inpReplies');
-    const engVal = qs('#engVal'), viewBar = qs('#viewBar'), viewText = qs('#viewText');
+    document.querySelector('#addBtn').onclick=()=>{const title=document.querySelector('#taskTitle').value.trim();if(!title)return toast('Enter task');const type=document.querySelector('#taskType').value,notes=document.querySelector('#taskNotes').value;tasks.unshift({id:id(),title,type,notes,done:false});save();render();document.querySelector('#addForm').reset();toast('Task added')}
+    document.querySelector('#clearBtn').onclick=()=>{if(!confirm('Clear all?'))return;tasks=[];save();render();toast('Cleared')}
+    document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{activeFilter=ch.dataset.filter;render()})
+    document.querySelector('#resetWeek').onclick=()=>{tasks=tasks.map(t=>({...t,done:false}));save();render();toast('Reset week')}
+    document.querySelector('#exportBtn').onclick=()=>{const data=JSON.stringify({tasks,ts:Date.now()},null,2);const blob=new Blob([data],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rialo_tasks.json';a.click();toast('Exported')}
 
-    function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))}
-    function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')}catch(e){return null}}
+    // Engagement calc
+    document.querySelector('#calcEng').onclick=()=>{const views=+document.querySelector('#inpViews').value||0,likes=+document.querySelector('#inpLikes').value||0,rts=+document.querySelector('#inpRTs').value||0,replies=+document.querySelector('#inpReplies').value||0;const eng=views?Math.round(((likes+rts+replies)/views)*10000)/100:0;document.querySelector('#engVal').textContent=eng+'%';document.querySelector('#viewBar').style.width=Math.min(100,views/10000*100)+'%';document.querySelector('#viewText').textContent=`${views} / 10000`;localStorage.setItem('rialo_eng',JSON.stringify({handle:document.querySelector('#xHandle').value,views,likes,rts,replies,eng}))}
+    document.querySelector('#saveEng').onclick=()=>{const v=localStorage.getItem('rialo_eng');if(!v)return toast('Nothing to save');const blob=new Blob([v],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rialo_eng.json';a.click();toast('Saved engagement')}
+    document.querySelector('#resetEng').onclick=()=>{['inpViews','inpLikes','inpRTs','inpReplies','xHandle'].forEach(id=>document.querySelector('#'+id).value='');document.querySelector('#engVal').textContent='0%';document.querySelector('#viewBar').style.width='0%';document.querySelector('#viewText').textContent='0 / 10000';localStorage.removeItem('rialo_eng');toast('Reset engagement')}
 
-    function render(){
-      // update totals
-      totalTasksEl.textContent = tasks.length;
-      qsa('.chip').forEach(ch=>{ch.classList.toggle('active', ch.dataset.filter===activeFilter)})
+    // Quiz
+    const quizQ=[{q:'What role after onboarding?',opts:['@RialONE','@RialORBIT','@RialOPS'],a:0},{q:'Views needed for @RialORBIT?',opts:['1k','10k','100k'],a:1},{q:'Weekly tasks channel?',opts:['#club-tasks','#general','#raids'],a:0}];
+    const quizList=document.querySelector('#quizList');let score=0;
+    function renderQuiz(){quizList.innerHTML='';quizQ.forEach((qq,i)=>{const d=document.createElement('div');d.className='quiz';d.innerHTML=`<div class=q>Q${i+1}. ${qq.q}</div>`;qq.opts.forEach((o,oi)=>{const b=document.createElement('button');b.className='btn ghost';b.textContent=o;b.onclick=()=>{if(b.disabled)return;if(oi===qq.a){b.style.background='linear-gradient(90deg,var(--accent),var(--accent-2))';score++;}else{b.style.background='var(--danger)'}Array.from(d.querySelectorAll('button')).forEach(bb=>bb.disabled=true);updateScore()};d.appendChild(b)});quizList.appendChild(d)});quizList.appendChild(Object.assign(document.createElement('div'),{innerHTML:`<div class=small>Score: <span id=quizScore>0</span>/${quizQ.length}</div><button id=exportScore class=btn style="margin-top:6px">Export Score</button>`}));document.querySelector('#exportScore').onclick=()=>{const blob=new Blob([JSON.stringify({score,ts:Date.now()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rialo_quiz.json';a.click();toast('Score exported')}}
+    function updateScore(){document.querySelector('#quizScore').textContent=score}
 
-      // visible tasks
-      taskList.innerHTML='';
-      const visible = tasks.filter(t=> activeFilter==='all' ? true : (activeFilter==='club' ? t.type==='club' : t.type===activeFilter));
-      visible.forEach(t=>{
-        const el=document.createElement('div'); el.className='task';
-        el.innerHTML = `
-          <div class="left">
-            <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
-              <input type="checkbox" ${t.done?'checked':''} data-id="${t.id}" aria-label="Mark ${escapeHTML(t.title)} done" />
-              <div>
-                <div class="title">${escapeHTML(t.title)}</div>
-                <div class="meta">${escapeHTML(t.notes||'')}</div>
-              </div>
-            </label>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="badge">${t.type}</div>
-            <button class="btn ghost" data-del="${t.id}">Delete</button>
-          </div>
-        `;
-        taskList.appendChild(el);
-      });
+    // Help
+    document.querySelector('#helpBtn').onclick=()=>{alert('How it works:\n- Add/complete tasks weekly.\n- Enter your X handle & stats to calc engagement.\n- Play quiz & export score.\n- Export JSON as proof for mods.')}
 
-      const total = tasks.length; const done = tasks.filter(t=>t.done).length; const pct = total===0?0:Math.round((done/total)*100);
-      qs('#progressBar').style.width = pct+'%'; progressText.textContent = `${done} / ${total} complete`;
-
-      // attach listeners
-      qsa('input[type=checkbox]').forEach(cb=>cb.onchange = toggleDone);
-      qsa('[data-del]').forEach(btn=>btn.onclick = delTask);
-    }
-
-    function escapeHTML(s){return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
-
-    // events
-    qs('#addBtn').addEventListener('click', ()=>{
-      const title = qs('#taskTitle').value.trim(); const type = qs('#taskType').value; const notes = qs('#taskNotes').value.trim();
-      if(!title) return toast('Enter a task title');
-      tasks.unshift({id:id(), title, type, notes, done:false}); save(); render(); qs('#addForm').reset(); toast('Task added');
-    });
-
-    qs('#clearBtn').addEventListener('click', ()=>{
-      if(!confirm('Clear ALL tasks? This cannot be undone.')) return; tasks=[]; save(); render(); toast('All tasks cleared');
-    });
-
-    function toggleDone(e){ const id=e.target.dataset.id; const t=tasks.find(x=>x.id===id); if(!t) return; t.done=e.target.checked; save(); render(); }
-    function delTask(e){ const id=e.target.dataset.del; tasks = tasks.filter(x=>x.id!==id); save(); render(); toast('Task deleted'); }
-
-    qsa('.chip').forEach(ch=>ch.onclick=()=>{ activeFilter = ch.dataset.filter; render(); });
-    qs('#showPending').onclick = ()=>{ activeFilter='all'; render(); tasks = tasks.filter(t=>!t.done).concat(tasks.filter(t=>t.done)); render(); }
-    qs('#showDone').onclick = ()=>{ activeFilter='all'; render(); tasks = tasks.filter(t=>t.done).concat(tasks.filter(t=>!t.done)); render(); }
-    qs('#focusClub').onclick = ()=>{ activeFilter='club'; render(); }
-
-    qs('#resetWeek').onclick = ()=>{ if(!confirm('Reset this week (mark all not-done)?')) return; tasks = tasks.map(t=>({...t, done:false})); save(); render(); toast('Week reset'); }
-    qs('#exportBtn').onclick = ()=>{ const data = {meta:{generated:Date.now(), source:'rialo-taskboard-v3'}, tasks}; const dataStr = JSON.stringify(data, null,2); const blob = new Blob([dataStr], {type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_tasks_export.json'; a.click(); URL.revokeObjectURL(url); toast('Export ready'); }
-
-    // Engagement calculator with validation
-    function toNum(v){ if(v===undefined || v===null) return 0; const s = v.toString().replaceAll(',','').trim(); if(s==='') return 0; const n = Number(s); return Number.isFinite(n) && n>=0 ? n : NaN }
-
-    qs('#calcEng').onclick = ()=>{
-      const views = toNum(inpViews.value); const likes = toNum(inpLikes.value); const rts = toNum(inpRTs.value); const replies = toNum(inpReplies.value);
-      if(Number.isNaN(views) || Number.isNaN(likes) || Number.isNaN(rts) || Number.isNaN(replies)){ return toast('Please enter valid non-negative numbers'); }
-      if(views===0){ engVal.textContent='0%'; viewBar.style.width='0%'; viewText.textContent='0 / 10000 views'; return toast('Views is zero — engagement is 0%'); }
-      const eng = Math.round(((likes + rts + replies)/views)*10000)/100; engVal.textContent = eng+'%';
-      const pct = Math.min(100, Math.round((views/10000)*100)); viewBar.style.width = pct+'%'; viewText.textContent = `${views.toLocaleString()} / 10000 views`;
-      // save last calc for export
-      localStorage.setItem('rialo_last_eng', JSON.stringify({views,likes,rts,replies,eng,ts:Date.now()}));
-      toast('Engagement calculated');
-    }
-    qs('#saveEng').onclick = ()=>{
-      const v = localStorage.getItem('rialo_last_eng'); if(!v) return toast('No recent calculation. Press Calculate first.'); const data = JSON.parse(v); const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_engagement_proof.json'; a.click(); URL.revokeObjectURL(url); toast('Engagement exported');
-    }
-    qs('#resetEng').onclick = ()=>{ inpViews.value=''; inpLikes.value=''; inpRTs.value=''; inpReplies.value=''; engVal.textContent='0%'; viewBar.style.width='0%'; viewText.textContent='0 / 10000 views'; localStorage.removeItem('rialo_last_eng'); toast('Engagement reset'); }
-
-    // Quiz improvements: add reset and clarity
-    const quizQuestions = [
-      {q:'What role do you get after completing onboarding in #waiting-room?', opts:['@RialONE','@RialORBIT','@RialOPS'], a:0},
-      {q:'How many views needed to qualify for @RialORBIT?', opts:['1k','10k','100k'], a:1},
-      {q:'Which channel hosts weekly creator tasks?', opts:['#club-tasks','#general','#raids'], a:0}
-    ];
-
-    function renderQuiz(){
-      const container = qs('#quizList'); container.innerHTML='';
-      quizQuestions.forEach((q,i)=>{
-        const el=document.createElement('div'); el.className='quiz';
-        el.innerHTML = `<div style="font-weight:700">Q${i+1}. ${escapeHTML(q.q)}</div>`;
-        q.opts.forEach((opt,oi)=>{
-          const b = document.createElement('button'); b.className='btn ghost'; b.style.display='block'; b.style.marginTop='8px'; b.textContent=opt; b.dataset.q=i; b.dataset.opt=oi;
-          b.onclick = ()=>{ answerQuiz(i,oi,b); };
-          el.appendChild(b);
-        });
-        container.appendChild(el);
-      });
-      const scoreWrap = document.createElement('div'); scoreWrap.style.marginTop='10px'; scoreWrap.innerHTML = `<div class="small muted">Your quiz score: <span id="quizScore">0</span> / ${quizQuestions.length}</div><div style="display:flex;gap:8px;margin-top:8px"><button id="exportScore" class="btn">Export Score</button><button id="resetQuiz" class="btn ghost">Reset Quiz</button></div>`;
-      container.appendChild(scoreWrap);
-      qs('#exportScore').onclick = exportQuizScore;
-      qs('#resetQuiz').onclick = resetQuiz;
-    }
-
-    const answered = {};
-    function answerQuiz(qIdx,optIdx,btn){ if(answered[qIdx]!==undefined) return; const correct = quizQuestions[qIdx].a; const parent = btn.parentElement; if(optIdx===correct){ btn.style.background='linear-gradient(90deg,var(--accent),var(--accent-2))'; btn.style.color='white'; answered[qIdx]=1; } else { btn.style.background= 'linear-gradient(90deg,#ef4444,#ff7b7b)'; btn.style.color='white'; answered[qIdx]=0; }
-      Array.from(parent.querySelectorAll('button')).forEach(b=>b.disabled=true);
-      // highlight correct answer
-      const correctBtn = parent.querySelector(`button[data-opt='${correct}']`);
-      if(correctBtn) correctBtn.style.outline='3px solid rgba(107,70,193,0.15)';
-      updateQuizScore();
-    }
-    function updateQuizScore(){ const s = Object.values(answered).reduce((a,b)=>a+(b||0),0); if(qs('#quizScore')) qs('#quizScore').textContent = s; }
-    function exportQuizScore(){ const score = Number(qs('#quizScore').textContent||0); const payload = {score,total:quizQuestions.length,answers:answered,ts:Date.now()}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_quiz_score.json'; a.click(); URL.revokeObjectURL(url); toast('Quiz exported'); }
-    function resetQuiz(){ for(const k in answered) delete answered[k]; renderQuiz(); toast('Quiz reset'); }
-
-    // help modal (simple alert for now)
-    qs('#helpBtn').onclick = ()=>{ alert('How it works:
-
-- Add tasks for #club-tasks, raids, challenges.
-- Mark tasks done to track weekly progress.
-- Use Engagement Calculator to compute engagement and save proof.
-- Play the mini-quiz and export your score to share with mods.
-- Export tasks JSON to share progress.'); }
-
-    // Init render
-    render(); renderQuiz();
-
-    // small accessibility: focus first input
-    qs('#taskTitle').focus();
+    render();renderQuiz();
   </script>
 </body>
 </html>
