@@ -161,105 +161,191 @@
   <div id="toast" class="toast"></div>
 
   <script>
+    // --- Final improved script ---
     const STORAGE_KEY='rialo_tasks_final';
-    let tasks=load()||[
+    // load tasks or sample tasks
+    function id(){return 't_'+Math.random().toString(36).slice(2,9)}
+    function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch(e){return null}}
+    function save(tasks){localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks))}
+    function toast(msg){const t=document.querySelector('#toast');t.textContent=msg;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2000)}
+
+    let tasks = load() || [
       {id:id(),title:'Post in #club-tasks (weekly brief)',type:'club',notes:'Follow weekly prompt',done:false},
       {id:id(),title:'Join Saturday Raid',type:'raid',notes:'Be online raid time',done:false},
       {id:id(),title:'Create challenge entry',type:'challenge',notes:'Submit 1 meme',done:false}
     ];
     let activeFilter='all';
 
-    function id(){return 't_'+Math.random().toString(36).slice(2,9)}
-    function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks))}
-    function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch(e){return null}}
-    function toast(msg){const t=document.querySelector('#toast');t.textContent=msg;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2000)}
-
+    // render tasks + stats
     function render(){
       const taskList=document.querySelector('#taskList');
       taskList.innerHTML='';
-      const vis=tasks.filter(t=>activeFilter==='all'||t.type===activeFilter);
-      vis.forEach(t=>{
-        const el=document.createElement('div');
-        el.className='task';
-        el.innerHTML=`<div><div class=title>${t.title}</div><div class=meta>${t.notes||''}</div></div>
-        <div style="display:flex;gap:6px;align-items:center"><span class=badge>${t.type}</span><input type=checkbox ${t.done?'checked':''} data-id=${t.id}></div>`;
-        taskList.appendChild(el)
+      const visible = tasks.filter(t=> activeFilter==='all' || t.type===activeFilter);
+      visible.forEach(t=>{
+        const el=document.createElement('div'); el.className='task';
+        el.innerHTML = `<div><div class="title">${escapeHTML(t.title)}</div><div class="meta">${escapeHTML(t.notes||'')}</div></div>
+          <div style="display:flex;gap:6px;align-items:center"><span class="badge">${t.type}</span><input type="checkbox" ${t.done?'checked':''} data-id="${t.id}"></div>`;
+        taskList.appendChild(el);
       });
-      const total=tasks.length,done=tasks.filter(t=>t.done).length;
-      const pct=total?Math.round((done/total)*100):0;
-      document.querySelector('#progressBar').style.width=pct+'%';
-      document.querySelector('#progressText').textContent=`${done} / ${total} complete`;
-      document.querySelector('#statTasks').textContent=`${done} / ${total}`;
-      document.querySelectorAll('[data-id]').forEach(cb=>cb.onchange=e=>{
-        const t=tasks.find(x=>x.id===e.target.dataset.id);
-        t.done=e.target.checked;save();render()
-      })
+      const total = tasks.length;
+      const done = tasks.filter(t=>t.done).length;
+      const pct = total? Math.round((done/total)*100):0;
+      document.querySelector('#progressBar').style.width = pct+'%';
+      document.querySelector('#progressText').textContent = `${done} / ${total} complete`;
+      document.querySelector('#statTasks').textContent = `${done} / ${total}`;
+      // attach checkbox handlers
+      document.querySelectorAll('[data-id]').forEach(cb=>{
+        cb.onchange = (e)=>{ const id = e.target.dataset.id; const task = tasks.find(x=>x.id===id); if(task){ task.done = e.target.checked; save(tasks); render(); } };
+      });
     }
 
-    document.querySelector('#addBtn').onclick=()=>{
-      const title=document.querySelector('#taskTitle').value.trim();
-      if(!title)return toast('Enter task');
-      const type=document.querySelector('#taskType').value,notes=document.querySelector('#taskNotes').value;
-      tasks.unshift({id:id(),title,type,notes,done:false});save();render();
-      document.querySelector('#addForm').reset();toast('Task added')
-    }
-    document.querySelector('#clearBtn').onclick=()=>{if(!confirm('Clear all?'))return;tasks=[];save();render();toast('Cleared')}
-    document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{activeFilter=ch.dataset.filter;render()})
-    document.querySelector('#resetWeek').onclick=()=>{tasks=tasks.map(t=>({...t,done:false}));save();render();toast('Reset week')}
-    document.querySelector('#exportBtn').onclick=()=>{const data=JSON.stringify({tasks,ts:Date.now()},null,2);const blob=new Blob([data],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rialo_tasks.json';a.click();toast('Exported')}
+    function escapeHTML(s){ return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
-    // Engagement calc with auto-load
-    function loadSavedEng(){try{const raw=localStorage.getItem('rialo_eng');if(!raw)return;const d=JSON.parse(raw);
-      document.querySelector('#xHandle').value=d.handle||'';
-      document.querySelector('#inpViews').value=d.views||'';
-      document.querySelector('#inpLikes').value=d.likes||'';
-      document.querySelector('#inpRTs').value=d.rts||'';
-      document.querySelector('#inpReplies').value=d.replies||'';
-      updateEngUI(d.views,d.eng)}catch(e){}}
-    function updateEngUI(views,eng){
-      document.querySelector('#engVal').textContent=(eng||0)+'%';
-      document.querySelector('#statEng').textContent=(eng||0)+'%';
-      const pct=Math.min(100,(views/10000*100)||0);
-      document.querySelector('#viewBar').style.width=pct+'%';
-      document.querySelector('#viewText').textContent=`${views||0} / 10000`
-    }
+    // UI handlers
+    document.querySelector('#addBtn').onclick = ()=>{
+      const title = document.querySelector('#taskTitle').value.trim();
+      if(!title) return toast('Enter task');
+      const type = document.querySelector('#taskType').value;
+      const notes = document.querySelector('#taskNotes').value;
+      tasks.unshift({id:id(),title,type,notes,done:false});
+      save(tasks); render(); document.querySelector('#addForm').reset(); toast('Task added');
+    };
+    document.querySelector('#clearBtn').onclick = ()=>{
+      if(!confirm('Clear all tasks?')) return;
+      tasks = []; save(tasks); render(); toast('Cleared');
+    };
+    document.querySelectorAll('.chip').forEach(ch=> ch.onclick = ()=>{ activeFilter = ch.dataset.filter; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); ch.classList.add('active'); render(); });
 
-    document.querySelector('#calcEng').onclick=()=>{
-      const h=document.querySelector('#xHandle').value,
-      v=+document.querySelector('#inpViews').value||0,
-      l=+document.querySelector('#inpLikes').value||0,
-      r=+document.querySelector('#inpRTs').value||0,
-      rep=+document.querySelector('#inpReplies').value||0;
-      const eng=v?Math.round(((l+r+rep)/v)*10000)/100:0;
-      updateEngUI(v,eng);
-      localStorage.setItem('rialo_eng',JSON.stringify({handle:h,views:v,likes:l,rts:r,replies:rep,eng}))
+    document.querySelector('#resetWeek').onclick = ()=>{
+      tasks = tasks.map(t=> ({...t, done:false})); save(tasks); render(); toast('Week reset');
+    };
+    document.querySelector('#exportBtn').onclick = ()=>{
+      const data = {meta:{source:'rialo_taskboard_v1',ts:Date.now()}, tasks};
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'rialo_tasks_export.json'; a.click();
+      toast('Exported tasks');
+    };
+
+    // Engagement (with auto-load)
+    function loadSavedEng(){
+      try{
+        const raw = localStorage.getItem('rialo_eng');
+        if(!raw) return;
+        const d = JSON.parse(raw);
+        document.querySelector('#xHandle').value = d.handle || '';
+        document.querySelector('#inpViews').value = d.views || '';
+        document.querySelector('#inpLikes').value = d.likes || '';
+        document.querySelector('#inpRTs').value = d.rts || '';
+        document.querySelector('#inpReplies').value = d.replies || '';
+        updateEngUI(d.views, d.eng);
+      }catch(e){}
     }
-    document.querySelector('#saveEng').onclick=()=>{
-      const v=localStorage.getItem('rialo_eng');if(!v)return toast('No data');
-      const blob=new Blob([v],{type:'application/json'});const a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);a.download='rialo_eng.json';a.click();toast('Saved')
+    function updateEngUI(views, eng){
+      document.querySelector('#engVal').textContent = (eng||0)+'%';
+      document.querySelector('#statEng').textContent = (eng||0)+'%';
+      const pct = Math.min(100, (views/10000*100) || 0);
+      document.querySelector('#viewBar').style.width = pct+'%';
+      document.querySelector('#viewText').textContent = `${views||0} / 10000`;
     }
-    document.querySelector('#resetEng').onclick=()=>{
-      ['xHandle','inpViews','inpLikes','inpRTs','inpReplies'].forEach(id=>document.querySelector('#'+id).value='');
-      updateEngUI(0,0);localStorage.removeItem('rialo_eng');toast('Reset')
-    }
+    document.querySelector('#calcEng').onclick = ()=>{
+      const handle = document.querySelector('#xHandle').value.trim();
+      const views = toNum(document.querySelector('#inpViews').value);
+      const likes = toNum(document.querySelector('#inpLikes').value);
+      const rts = toNum(document.querySelector('#inpRTs').value);
+      const replies = toNum(document.querySelector('#inpReplies').value);
+      if(Number.isNaN(views) || Number.isNaN(likes) || Number.isNaN(rts) || Number.isNaN(replies)){ return toast('Enter valid non-negative numbers'); }
+      const eng = views? Math.round(((likes + rts + replies)/views) * 10000)/100 : 0;
+      updateEngUI(views, eng);
+      const payload = {handle, views, likes, rts, replies, eng, ts: Date.now()};
+      localStorage.setItem('rialo_eng', JSON.stringify(payload));
+      toast('Engagement calculated');
+    };
+    document.querySelector('#saveEng').onclick = ()=>{
+      const v = localStorage.getItem('rialo_eng');
+      if(!v) return toast('No engagement to save');
+      const blob = new Blob([v],{type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'rialo_eng.json'; a.click();
+      toast('Engagement exported');
+    };
+    document.querySelector('#resetEng').onclick = ()=>{
+      ['xHandle','inpViews','inpLikes','inpRTs','inpReplies'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value=''; });
+      updateEngUI(0,0); localStorage.removeItem('rialo_eng'); toast('Engagement reset');
+    };
+    function toNum(v){ if(v===undefined||v===null) return NaN; const s = v.toString().replaceAll(',','').trim(); if(s==='') return 0; const n = Number(s); return Number.isFinite(n) && n>=0 ? n : NaN; }
 
     // Quiz
-    const quizQ=[{q:'What role after onboarding?',opts:['@RialONE','@RialORBIT','@RialOPS'],a:0},
-      {q:'Views needed for @RialORBIT?',opts:['1k','10k','100k'],a:1},
-      {q:'Weekly tasks channel?',opts:['#club-tasks','#general','#raids'],a:0}];
-    const quizList=document.querySelector('#quizList');let score=0;
+    const quizQ = [
+      {q:'What role after onboarding?', opts:['@RialONE','@RialORBIT','@RialOPS'], a:0},
+      {q:'Views needed for @RialORBIT?', opts:['1k','10k','100k'], a:1},
+      {q:'Weekly tasks channel?', opts:['#club-tasks','#general','#raids'], a:0}
+    ];
+    let score = 0;
     function renderQuiz(){
-      quizList.innerHTML='';
-      quizQ.forEach((qq,i)=>{
-        const d=document.createElement('div');d.className='quiz';d.innerHTML=`<div class=q>Q${i+1}. ${qq.q}</div>`;
-        qq.opts.forEach((o,oi)=>{
-          const b=document.createElement('button');b.className='btn ghost';b.textContent=o;
-          b.onclick=()=>{
-            if(b.disabled)return;
-            if(oi===qq.a){b.style.background='linear-gradient(90deg,var(--accent),var(--accent-2))';score++}
-            else{b.style.background='var(--danger)'}
-            Array.from(d.querySelectorAll('button')).forEach(bb=>bb.disabled=true);
-            updateScore()
+      const quizList = document.querySelector('#quizList');
+      quizList.innerHTML = '';
+      quizQ.forEach((qq, i)=>{
+        const wrap = document.createElement('div'); wrap.className='quiz';
+        const qtitle = document.createElement('div'); qtitle.className='q'; qtitle.textContent = `Q${i+1}. ${qq.q}`; wrap.appendChild(qtitle);
+        qq.opts.forEach((opt, oi)=>{
+          const b = document.createElement('button'); b.className='btn ghost'; b.textContent = opt;
+          b.onclick = ()=>{
+            if(b.disabled) return;
+            // mark
+            if(oi === qq.a){
+              b.style.background = 'linear-gradient(90deg,var(--accent),var(--accent-2))';
+              score++;
+            } else {
+              b.style.background = 'var(--danger)';
+            }
+            // disable siblings, highlight correct
+            Array.from(wrap.querySelectorAll('button')).forEach(bb=>{ bb.disabled = true; });
+            const correctBtn = Array.from(wrap.querySelectorAll('button'))[qq.a];
+            if(correctBtn) correctBtn.style.outline = '3px solid rgba(107,70,193,0.12)';
+            updateScore();
           };
-          d.appendChild
+          wrap.appendChild(b);
+        });
+        quizList.appendChild(wrap);
+      });
+      // score row + export + reset
+      const ctr = document.createElement('div');
+      ctr.style.marginTop = '10px';
+      ctr.innerHTML = `<div class="small">Score: <span id="quizScore">0</span> / ${quizQ.length}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="exportScore" class="btn">Export Score</button>
+          <button id="resetQuiz" class="btn ghost">Reset Quiz</button>
+        </div>`;
+      quizList.appendChild(ctr);
+      document.getElementById('exportScore').onclick = exportQuizScore;
+      document.getElementById('resetQuiz').onclick = resetQuiz;
+    }
+    function updateScore(){
+      document.getElementById('quizScore').textContent = score;
+      document.getElementById('statQuiz').textContent = `${score} / ${quizQ.length}`;
+    }
+    function exportQuizScore(){
+      const payload = {score, total: quizQ.length, ts: Date.now()};
+      const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'rialo_quiz.json'; a.click();
+      toast('Quiz exported');
+    }
+    function resetQuiz(){
+      score = 0;
+      renderQuiz();
+      updateScore();
+      toast('Quiz reset');
+    }
+
+    // help
+    document.querySelector('#helpBtn').onclick = ()=> {
+      alert('How it works:\\n- Add/complete tasks weekly.\\n- Enter your X handle & stats then Calculate to get engagement %.\\n- Save/Export engagement as proof.\\n- Play the mini-quiz and export score for mods.');
+    };
+
+    // init
+    render(); renderQuiz(); loadSavedEng(); updateScore();
+
+    // accessibility: focus first input
+    try{ document.getElementById('taskTitle').focus(); }catch(e){}
+  </script>
+</body>
+</html>
