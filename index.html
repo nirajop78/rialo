@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rialo — Community Task Board</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#6b46c1;--muted:#94a3b8;--good:#16a34a;--danger:#ef4444}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, Arial; margin:0; background:linear-gradient(180deg,#071025 0%,#04101a 100%); color:#e6eef8; min-height:100vh; padding:28px}
+    .wrap{max-width:980px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    .sub{color:var(--muted);font-size:13px}
+    .top-actions{display:flex;gap:8px}
+    button, .btn{background:var(--accent);color:white;border:0;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .board{display:grid;grid-template-columns:1fr 360px;gap:16px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .filters{display:flex;gap:8px;margin-bottom:12px}
+    .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted);font-size:13px;cursor:pointer}
+    .chip.active{background:linear-gradient(90deg,var(--accent),#8b5cf6);color:white}
+
+    .task-list{display:flex;flex-direction:column;gap:8px}
+    .task{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .task .left{display:flex;gap:12px;align-items:center}
+    .badge{font-size:12px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted)}
+    .task .title{font-weight:600}
+    .task .meta{font-size:12px;color:var(--muted)}
+
+    .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);width:0%}
+
+    .small{font-size:13px;color:var(--muted)}
+
+    .add-form{display:flex;flex-direction:column;gap:8px}
+    input[type=text], select, textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    .right-col{display:flex;flex-direction:column;gap:12px}
+    .stats{display:flex;gap:12px}
+    .stat{flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);text-align:center}
+    .muted{color:var(--muted)}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    @media(max-width:900px){.board{grid-template-columns:1fr;}
+      .right-col{order:2}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Rialo — Community Task Board</h1>
+        <div class="sub">Weekly tasks • track completion • aim for roles like @RialORBIT</div>
+      </div>
+      <div class="top-actions">
+        <button id="resetWeek" class="ghost">Reset Week</button>
+        <button id="exportBtn">Export JSON</button>
+      </div>
+    </header>
+
+    <main class="board">
+      <section class="card">
+        <div class="filters">
+          <div class="chip active" data-filter="all">All</div>
+          <div class="chip" data-filter="club">#club-tasks</div>
+          <div class="chip" data-filter="raid">Raids</div>
+          <div class="chip" data-filter="challenge">Challenges</div>
+        </div>
+
+        <div style="margin-bottom:12px;display:flex;gap:12px;align-items:center;justify-content:space-between">
+          <div>
+            <div class="small">Weekly Progress</div>
+            <div style="width:280px;margin-top:8px" class="progress"><i id="progressBar"></i></div>
+          </div>
+          <div class="small" id="progressText">0 / 0 complete</div>
+        </div>
+
+        <div class="task-list" id="taskList"></div>
+
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:14px 0">
+
+        <div>
+          <div class="small" style="margin-bottom:8px">Add new task</div>
+          <form id="addForm" class="add-form" onsubmit="return false;">
+            <input id="taskTitle" type="text" placeholder="Task title (e.g. Create club post)" required />
+            <select id="taskType">
+              <option value="club">#club-tasks</option>
+              <option value="raid">Raids</option>
+              <option value="challenge">Challenges</option>
+              <option value="other">Other</option>
+            </select>
+            <textarea id="taskNotes" rows="2" placeholder="Notes or instructions (optional)"></textarea>
+            <div style="display:flex;gap:8px">
+              <button id="addBtn" type="button">Add Task</button>
+              <button id="clearBtn" class="ghost" type="button">Clear All</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <aside class="right-col">
+        <div class="card stat">
+          <div class="muted">Total Tasks</div>
+          <div id="totalTasks" style="font-weight:700;font-size:20px">0</div>
+        </div>
+
+        <div class="card" style="padding:12px">
+          <div class="muted">Quick filters</div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn" id="showPending">Show Pending</button>
+            <button class="btn" id="showDone">Show Done</button>
+            <button class="ghost" id="focusClub">My Club Tasks</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="muted">Guide</div>
+          <ul style="margin:8px 0 0 16px;color:var(--muted);font-size:13px;line-height:1.5">
+            <li>Mark tasks complete by clicking the toggle.</li>
+            <li>Use "Reset Week" every Monday (manual) to start fresh.</li>
+            <li>Export JSON to share progress with mods for role proofs.</li>
+          </ul>
+        </div>
+
+      </aside>
+    </main>
+
+    <footer>Built for Rialo • Data saved locally in your browser (localStorage)</footer>
+  </div>
+
+  <script>
+    // Simple client-side Task Board
+    const STORAGE_KEY = 'rialo_tasks_v1';
+
+    const sampleTasks = [
+      {id: id(), title:'Post in #club-tasks (weekly brief)', type:'club', notes:'Follow weekly prompt and tag #club-tasks', done:false},
+      {id: id(), title:'Join Saturday Raid', type:'raid', notes:'Be online at raid time and follow raid lead', done:false},
+      {id: id(), title:'Create challenge entry', type:'challenge', notes:'Submit 1 unique meme for challenge', done:false},
+      {id: id(), title:'Boost a club post (share)', type:'club', notes:'Retweet and comment to push reach', done:false}
+    ];
+
+    // Helpers
+    function id(){return 't_'+Math.random().toString(36).slice(2,9)}
+    function qs(sel){return document.querySelector(sel)}
+    function qsa(sel){return document.querySelectorAll(sel)}
+
+    // State
+    let tasks = load() || sampleTasks.slice();
+    let activeFilter = 'all';
+
+    // DOM refs
+    const taskList = qs('#taskList');
+    const progressBar = qs('#progressBar');
+    const progressText = qs('#progressText');
+    const totalTasksEl = qs('#totalTasks');
+
+    function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))}
+    function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')}catch(e){return null}}
+
+    function render(){
+      // filter chips
+      qsa('.chip').forEach(ch=>{
+        ch.classList.toggle('active', ch.dataset.filter===activeFilter);
+      })
+
+      // tasks
+      taskList.innerHTML = '';
+      const visible = tasks.filter(t=>{
+        if(activeFilter==='all') return true;
+        if(activeFilter==='club') return t.type==='club';
+        return t.type===activeFilter;
+      })
+
+      visible.forEach(t=>{
+        const el = document.createElement('div'); el.className='task';
+        el.innerHTML = `
+          <div class="left">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <input type="checkbox" ${t.done? 'checked':''} data-id="${t.id}" />
+              <div>
+                <div class="title">${escapeHTML(t.title)}</div>
+                <div class="meta">${escapeHTML(t.notes||'')}</div>
+              </div>
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="badge">${t.type}</div>
+            <button class="ghost" data-del="${t.id}">Delete</button>
+          </div>
+        `
+        taskList.appendChild(el)
+      })
+
+      // stats
+      const total = tasks.length;
+      const done = tasks.filter(t=>t.done).length;
+      const pct = total===0?0:Math.round((done/total)*100);
+      progressBar.style.width = pct+'%';
+      progressText.textContent = `${done} / ${total} complete`;
+      totalTasksEl.textContent = total;
+
+      // add listeners
+      qsa('input[type=checkbox]').forEach(cb=>cb.onchange = toggleDone);
+      qsa('[data-del]').forEach(btn=>btn.onclick = delTask);
+    }
+
+    function escapeHTML(str){return (str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+
+    // Events
+    qs('#addBtn').addEventListener('click', ()=>{
+      const title = qs('#taskTitle').value.trim();
+      const type = qs('#taskType').value;
+      const notes = qs('#taskNotes').value.trim();
+      if(!title) return alert('Please enter a task title');
+      const t = {id:id(), title, type, notes, done:false};
+      tasks.unshift(t);
+      save(); render();
+      qs('#addForm').reset();
+    })
+
+    qs('#clearBtn').addEventListener('click', ()=>{
+      if(!confirm('Clear ALL tasks and start fresh?')) return;
+      tasks = [];
+      save(); render();
+    })
+
+    function toggleDone(e){
+      const id = e.target.dataset.id;
+      const t = tasks.find(x=>x.id===id); if(!t) return;
+      t.done = e.target.checked;
+      save(); render();
+    }
+
+    function delTask(e){
+      const id = e.target.dataset.del;
+      tasks = tasks.filter(x=>x.id!==id);
+      save(); render();
+    }
+
+    qsa('.chip').forEach(ch=>ch.onclick = ()=>{activeFilter = ch.dataset.filter; render()})
+
+    qs('#showPending').onclick = ()=>{activeFilter='all'; render(); const pending = tasks.filter(t=>!t.done); tasks = pending.concat(tasks.filter(t=>t.done)); render()}
+    qs('#showDone').onclick = ()=>{activeFilter='all'; render(); const done = tasks.filter(t=>t.done); tasks = done.concat(tasks.filter(t=>!t.done)); render()}
+    qs('#focusClub').onclick = ()=>{activeFilter='club'; render()}
+
+    qs('#resetWeek').onclick = ()=>{
+      if(!confirm('Reset this week: mark all tasks as not done?')) return;
+      tasks = tasks.map(t=>({...t, done:false})); save(); render();
+    }
+
+    qs('#exportBtn').onclick = ()=>{
+      const dataStr = JSON.stringify(tasks, null, 2);
+      const blob = new Blob([dataStr], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='rialo_tasks.json'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // init
+    render();
+  </script>
+</body>
+</html>
