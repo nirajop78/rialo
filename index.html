@@ -3,37 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rialo — Community Task Board</title>
+  <title>Rialo — Community Task Board (Improved)</title>
+  <meta name="description" content="Task board to track #club-tasks, raids, and challenges. Engagement calculator, quiz, progress and export for Rialo creators." />
   <style>
-    :root{--bg:#071025;--card:#071827;--accent:#6b46c1;--accent-2:#8b5cf6;--muted:#94a3b8;--glass:rgba(255,255,255,0.03);--good:#16a34a}
+    :root{--bg:#04101a;--card:#072233;--accent:#6b46c1;--accent-2:#8b5cf6;--muted:#9fb0c8;--glass:rgba(255,255,255,0.03);--ok:#16a34a;--danger:#ef4444}
     *{box-sizing:border-box}
-    body{font-family:Inter, system-ui, Arial; margin:0; background:linear-gradient(180deg,#04101a 0%,#071025 100%); color:#e6eef8; min-height:100vh; padding:28px}
+    html,body{height:100%}
+    body{font-family:Inter, system-ui, Arial; margin:0; background:linear-gradient(180deg,#03101a 0%,#041827 100%); color:#e6eef8; min-height:100vh; padding:22px}
     .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 20px rgba(107,70,193,0.18)}
-    .logo svg{width:36px;height:36px}
-    h1{font-size:20px;margin:0}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 8px 28px rgba(107,70,193,0.18)}
+    .logo svg{width:34px;height:34px}
+    h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:13px}
-    .top-actions{display:flex;gap:8px}
+    .top-actions{display:flex;gap:10px}
     .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:0;padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:700}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
     .board{display:grid;grid-template-columns:1fr 380px;gap:18px}
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
-    .filters{display:flex;gap:8px;margin-bottom:12px}
-    .chip{padding:8px 10px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);font-size:13px;cursor:pointer}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);font-size:13px;cursor:pointer}
     .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
 
     .task-list{display:flex;flex-direction:column;gap:10px}
-    .task{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-    .task .left{display:flex;gap:14px;align-items:center}
+    .task{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.008);border:1px solid rgba(255,255,255,0.02)}
+    .task .left{display:flex;gap:12px;align-items:center}
     .badge{font-size:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);text-transform:capitalize}
     .task .title{font-weight:700}
     .task .meta{font-size:13px;color:var(--muted)}
 
     .progress{height:14px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
-    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .5s ease}
 
     .small{font-size:13px;color:var(--muted)}
 
@@ -42,16 +44,17 @@
 
     .right-col{display:flex;flex-direction:column;gap:14px}
     .stats{display:flex;gap:12px}
-    .stat{flex:1;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));text-align:center}
+    .stat{flex:1;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));text-align:center}
     .muted{color:var(--muted)}
 
     .eng-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-    .meter{width:160px;height:160px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent);border:6px solid rgba(255,255,255,0.02)}
-    .meter .val{font-weight:800;font-size:22px}
+    .meter{width:150px;height:150px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:6px solid rgba(255,255,255,0.02)}
+    .meter .val{font-weight:800;font-size:18px}
 
     .quiz-list{display:flex;flex-direction:column;gap:8px}
     .quiz{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-    .quiz button{margin-top:8px}
+
+    .toast{position:fixed;right:18px;bottom:18px;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:10px 14px;border-radius:10px;color:white;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:none}
 
     footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
 
@@ -63,52 +66,64 @@
     <header>
       <div class="brand">
         <div class="logo" aria-hidden>
-          <!-- Simple planet logo SVG as placeholder for Rialo -->
+          <!-- Rialo styled planet logo -->
           <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="20" fill="white" opacity="0.95"/>
-            <path d="M6 40C18 28 46 24 58 12" stroke="#071025" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 38C20 26 44 22 56 10" stroke="#071025" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div>
           <h1>Rialo — Community Task Board</h1>
-          <div class="sub">Weekly tasks • track completion • proof for roles like @RialORBIT</div>
+          <div class="sub">Weekly tasks • progress to roles • engagement proofs</div>
         </div>
       </div>
       <div class="top-actions">
+        <button id="helpBtn" class="btn ghost">How it works</button>
         <button id="resetWeek" class="btn ghost">Reset Week</button>
         <button id="exportBtn" class="btn">Export JSON</button>
       </div>
     </header>
 
     <main class="board">
-      <section class="card">
-        <div class="filters">
-          <div class="chip active" data-filter="all">All</div>
-          <div class="chip" data-filter="club">#club-tasks</div>
-          <div class="chip" data-filter="raid">Raids</div>
-          <div class="chip" data-filter="challenge">Challenges</div>
+      <section class="card" aria-labelledby="tasks-heading">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div id="tasks-heading" class="small">Tasks</div>
+            <div style="font-weight:700;font-size:18px">Weekly Task Board</div>
+          </div>
+          <div style="text-align:right">
+            <div class="small muted">Total</div>
+            <div id="totalTasks" style="font-weight:800;font-size:18px">0</div>
+          </div>
+        </div>
+
+        <div class="filters" role="tablist" aria-label="Task Filters">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="club">#club-tasks</button>
+          <button class="chip" data-filter="raid">Raids</button>
+          <button class="chip" data-filter="challenge">Challenges</button>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div style="flex:1;margin-right:12px">
             <div class="small">Weekly Progress</div>
-            <div style="width:100%;margin-top:8px" class="progress"><i id="progressBar" style="width:0%"></i></div>
+            <div style="width:100%;margin-top:8px" class="progress" aria-hidden><i id="progressBar"></i></div>
           </div>
           <div style="text-align:right">
             <div class="small" id="progressText">0 / 0 complete</div>
-            <div class="small muted">Keep pushing to earn roles</div>
+            <div class="small muted">Complete tasks to prove work for mods</div>
           </div>
         </div>
 
-        <div class="task-list" id="taskList"></div>
+        <div id="taskList" class="task-list" aria-live="polite"></div>
 
         <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:16px 0">
 
         <div>
           <div class="small" style="margin-bottom:8px">Add new task</div>
-          <form id="addForm" class="add-form" onsubmit="return false;">
-            <input id="taskTitle" type="text" placeholder="Task title (e.g. Create club post)" required />
-            <select id="taskType">
+          <form id="addForm" class="add-form" onsubmit="return false;" aria-label="Add task form">
+            <input id="taskTitle" type="text" placeholder="Task title (e.g. Create club post)" required aria-required="true" />
+            <select id="taskType" aria-label="Task type">
               <option value="club">#club-tasks</option>
               <option value="raid">Raids</option>
               <option value="challenge">Challenges</option>
@@ -123,28 +138,29 @@
         </div>
       </section>
 
-      <aside class="right-col">
+      <aside class="right-col" aria-labelledby="right-col-heading">
         <div class="card eng-card">
           <div>
             <div class="muted">X Engagement Calculator</div>
             <div style="display:flex;gap:8px;margin-top:10px">
-              <input id="inpViews" type="text" placeholder="Views" />
-              <input id="inpLikes" type="text" placeholder="Likes" />
+              <input id="inpViews" type="text" placeholder="Views (e.g. 12500)" aria-label="Views" />
+              <input id="inpLikes" type="text" placeholder="Likes" aria-label="Likes" />
             </div>
             <div style="display:flex;gap:8px;margin-top:8px">
-              <input id="inpRTs" type="text" placeholder="Retweets" />
-              <input id="inpReplies" type="text" placeholder="Replies" />
+              <input id="inpRTs" type="text" placeholder="Retweets" aria-label="Retweets" />
+              <input id="inpReplies" type="text" placeholder="Replies" aria-label="Replies" />
             </div>
             <div style="margin-top:10px;display:flex;gap:8px">
               <button id="calcEng" class="btn">Calculate</button>
-              <button id="saveEng" class="btn ghost">Save</button>
+              <button id="saveEng" class="btn ghost">Save Result</button>
+              <button id="resetEng" class="btn ghost">Reset</button>
             </div>
             <div style="margin-top:10px">
               <div class="small muted">Engagement formula: (Likes + RTs + Replies) ÷ Views × 100</div>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-            <div class="meter"><div class="val" id="engVal">0%</div></div>
+            <div class="meter" aria-hidden><div class="val" id="engVal">0%</div></div>
             <div class="small muted">Progress to 10k views</div>
             <div style="width:160px;margin-top:6px" class="progress"><i id="viewBar" style="width:0%"></i></div>
             <div class="small" id="viewText">0 / 10000 views</div>
@@ -160,27 +176,27 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="quizCard">
           <div class="muted">Mini Quiz — Play & Earn Points</div>
-          <div class="quiz-list" id="quizList">
-            <!-- quiz injected here -->
-          </div>
+          <div class="quiz-list" id="quizList" aria-live="polite"></div>
           <div style="margin-top:10px">
-            <div class="small muted">Complete the quiz and export your score to share with mods.</div>
+            <div class="small muted">Complete the quiz & export your score for mods.</div>
           </div>
         </div>
 
       </aside>
     </main>
 
-    <footer>Built for Rialo • Data saved locally in your browser (localStorage)</footer>
+    <footer>Built for Rialo • Data stored in your browser (localStorage). Reach out for backend sync (Firebase/Discord).</footer>
   </div>
 
-  <script>
-    // STORAGE KEY
-    const STORAGE_KEY = 'rialo_tasks_v2';
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    // sample tasks
+  <script>
+    // Improved Task Board script
+    const STORAGE_KEY = 'rialo_tasks_v3';
+    const SAMPLE_KEY = 'rialo_seen_sample_v1';
+
     const sampleTasks = [
       {id: id(), title:'Post in #club-tasks (weekly brief)', type:'club', notes:'Follow weekly prompt and tag #club-tasks', done:false},
       {id: id(), title:'Join Saturday Raid', type:'raid', notes:'Be online at raid time and follow raid lead', done:false},
@@ -192,52 +208,43 @@
     function id(){return 't_'+Math.random().toString(36).slice(2,9)}
     function qs(s){return document.querySelector(s)}
     function qsa(s){return document.querySelectorAll(s)}
+    function toast(msg){ const t=qs('#toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none',3000); }
 
     // state
-    let tasks = load() || sampleTasks.slice();
+    let tasks = load() || [];
+    if(!localStorage.getItem(SAMPLE_KEY)){
+      // first time visitor -> populate sample tasks
+      tasks = sampleTasks.slice();
+      localStorage.setItem(SAMPLE_KEY,'1');
+      save();
+    }
     let activeFilter = 'all';
 
-    // dom refs
-    const taskList = qs('#taskList');
-    const progressBar = qs('#progressBar');
-    const progressText = qs('#progressText');
-    const totalTasksEl = qs('#totalTasks');
-
-    // engagement refs
-    const inpViews = qs('#inpViews');
-    const inpLikes = qs('#inpLikes');
-    const inpRTs = qs('#inpRTs');
-    const inpReplies = qs('#inpReplies');
-    const engVal = qs('#engVal');
-    const viewBar = qs('#viewBar');
-    const viewText = qs('#viewText');
-
-    // quiz data
-    const quizQuestions = [
-      {q:'What role do you get after completing onboarding in #waiting-room?', opts:['@RialONE','@RialORBIT','@RialOPS'], a:0},
-      {q:'How many views needed to qualify for @RialORBIT?', opts:['1k','10k','100k'], a:1},
-      {q:'Which channel hosts weekly creator tasks?', opts:['#club-tasks','#general','#raids'], a:0}
-    ];
+    // ui refs
+    const taskList = qs('#taskList'); const progressBar = qs('#progressBar'); const progressText = qs('#progressText'); const totalTasksEl = qs('#totalTasks');
+    const inpViews = qs('#inpViews'), inpLikes = qs('#inpLikes'), inpRTs = qs('#inpRTs'), inpReplies = qs('#inpReplies');
+    const engVal = qs('#engVal'), viewBar = qs('#viewBar'), viewText = qs('#viewText');
 
     function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))}
     function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')}catch(e){return null}}
 
     function render(){
-      // chips
+      // update totals
+      totalTasksEl.textContent = tasks.length;
       qsa('.chip').forEach(ch=>{ch.classList.toggle('active', ch.dataset.filter===activeFilter)})
 
-      // list
+      // visible tasks
       taskList.innerHTML='';
-      const visible = tasks.filter(t=> activeFilter==='all' ? true : (activeFilter==='club'?t.type==='club':t.type===activeFilter));
+      const visible = tasks.filter(t=> activeFilter==='all' ? true : (activeFilter==='club' ? t.type==='club' : t.type===activeFilter));
       visible.forEach(t=>{
         const el=document.createElement('div'); el.className='task';
-        el.innerHTML=`
+        el.innerHTML = `
           <div class="left">
             <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
-              <input type="checkbox" ${t.done?'checked':''} data-id="${t.id}" />
+              <input type="checkbox" ${t.done?'checked':''} data-id="${t.id}" aria-label="Mark ${escapeHTML(t.title)} done" />
               <div>
-                <div class="title">${esc(t.title)}</div>
-                <div class="meta">${esc(t.notes||'')}</div>
+                <div class="title">${escapeHTML(t.title)}</div>
+                <div class="meta">${escapeHTML(t.notes||'')}</div>
               </div>
             </label>
           </div>
@@ -249,89 +256,107 @@
         taskList.appendChild(el);
       });
 
-      // stats
       const total = tasks.length; const done = tasks.filter(t=>t.done).length; const pct = total===0?0:Math.round((done/total)*100);
-      qs('#progressBar').style.width = pct+'%';
-      progressText.textContent = `${done} / ${total} complete`;
-      // total tasks element (create if missing)
-      if(!qs('#totalTasks')){
-        const stat = document.createElement('div'); stat.id='totalTasks'; stat.style.display='none'; document.body.appendChild(stat);
-      }
+      qs('#progressBar').style.width = pct+'%'; progressText.textContent = `${done} / ${total} complete`;
 
-      // listeners
+      // attach listeners
       qsa('input[type=checkbox]').forEach(cb=>cb.onchange = toggleDone);
       qsa('[data-del]').forEach(btn=>btn.onclick = delTask);
     }
 
-    function esc(s){return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+    function escapeHTML(s){return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
 
     // events
     qs('#addBtn').addEventListener('click', ()=>{
       const title = qs('#taskTitle').value.trim(); const type = qs('#taskType').value; const notes = qs('#taskNotes').value.trim();
-      if(!title) return alert('Enter a task title');
-      tasks.unshift({id:id(), title, type, notes, done:false}); save(); render(); qs('#addForm').reset();
+      if(!title) return toast('Enter a task title');
+      tasks.unshift({id:id(), title, type, notes, done:false}); save(); render(); qs('#addForm').reset(); toast('Task added');
     });
-    qs('#clearBtn').addEventListener('click', ()=>{ if(!confirm('Clear ALL tasks?')) return; tasks=[]; save(); render(); });
-    function toggleDone(e){ const id=e.target.dataset.id; const t=tasks.find(x=>x.id===id); if(!t) return; t.done=e.target.checked; save(); render(); }
-    function delTask(e){ const id=e.target.dataset.del; tasks = tasks.filter(x=>x.id!==id); save(); render(); }
 
-    qsa('.chip').forEach(ch=>ch.onclick=()=>{ activeFilter=ch.dataset.filter; render(); });
+    qs('#clearBtn').addEventListener('click', ()=>{
+      if(!confirm('Clear ALL tasks? This cannot be undone.')) return; tasks=[]; save(); render(); toast('All tasks cleared');
+    });
+
+    function toggleDone(e){ const id=e.target.dataset.id; const t=tasks.find(x=>x.id===id); if(!t) return; t.done=e.target.checked; save(); render(); }
+    function delTask(e){ const id=e.target.dataset.del; tasks = tasks.filter(x=>x.id!==id); save(); render(); toast('Task deleted'); }
+
+    qsa('.chip').forEach(ch=>ch.onclick=()=>{ activeFilter = ch.dataset.filter; render(); });
     qs('#showPending').onclick = ()=>{ activeFilter='all'; render(); tasks = tasks.filter(t=>!t.done).concat(tasks.filter(t=>t.done)); render(); }
     qs('#showDone').onclick = ()=>{ activeFilter='all'; render(); tasks = tasks.filter(t=>t.done).concat(tasks.filter(t=>!t.done)); render(); }
     qs('#focusClub').onclick = ()=>{ activeFilter='club'; render(); }
 
-    qs('#resetWeek').onclick = ()=>{ if(!confirm('Reset this week (mark all undone)?')) return; tasks = tasks.map(t=>({...t, done:false})); save(); render(); }
-    qs('#exportBtn').onclick = ()=>{ const dataStr = JSON.stringify(tasks, null,2); const blob = new Blob([dataStr], {type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_tasks.json'; a.click(); URL.revokeObjectURL(url); }
+    qs('#resetWeek').onclick = ()=>{ if(!confirm('Reset this week (mark all not-done)?')) return; tasks = tasks.map(t=>({...t, done:false})); save(); render(); toast('Week reset'); }
+    qs('#exportBtn').onclick = ()=>{ const data = {meta:{generated:Date.now(), source:'rialo-taskboard-v3'}, tasks}; const dataStr = JSON.stringify(data, null,2); const blob = new Blob([dataStr], {type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_tasks_export.json'; a.click(); URL.revokeObjectURL(url); toast('Export ready'); }
 
-    // Engagement calculation
+    // Engagement calculator with validation
+    function toNum(v){ if(v===undefined || v===null) return 0; const s = v.toString().replaceAll(',','').trim(); if(s==='') return 0; const n = Number(s); return Number.isFinite(n) && n>=0 ? n : NaN }
+
     qs('#calcEng').onclick = ()=>{
-      const views = Number((inpViews.value||'').toString().replaceAll(',',''))||0;
-      const likes = Number((inpLikes.value||'').toString().replaceAll(',',''))||0;
-      const rts = Number((inpRTs.value||'').toString().replaceAll(',',''))||0;
-      const replies = Number((inpReplies.value||'').toString().replaceAll(',',''))||0;
-      const eng = views>0? Math.round(((likes + rts + replies)/views)*10000)/100 : 0;
-      engVal.textContent = eng+'%';
-      // view progress
-      const pct = Math.min(100, Math.round((views/10000)*100));
-      viewBar.style.width = pct+'%';
-      viewText.textContent = `${views.toLocaleString()} / 10000 views`;
-      // store last calc in localStorage as quick proof
+      const views = toNum(inpViews.value); const likes = toNum(inpLikes.value); const rts = toNum(inpRTs.value); const replies = toNum(inpReplies.value);
+      if(Number.isNaN(views) || Number.isNaN(likes) || Number.isNaN(rts) || Number.isNaN(replies)){ return toast('Please enter valid non-negative numbers'); }
+      if(views===0){ engVal.textContent='0%'; viewBar.style.width='0%'; viewText.textContent='0 / 10000 views'; return toast('Views is zero — engagement is 0%'); }
+      const eng = Math.round(((likes + rts + replies)/views)*10000)/100; engVal.textContent = eng+'%';
+      const pct = Math.min(100, Math.round((views/10000)*100)); viewBar.style.width = pct+'%'; viewText.textContent = `${views.toLocaleString()} / 10000 views`;
+      // save last calc for export
       localStorage.setItem('rialo_last_eng', JSON.stringify({views,likes,rts,replies,eng,ts:Date.now()}));
+      toast('Engagement calculated');
     }
-    qs('#saveEng').onclick = ()=>{ const v = localStorage.getItem('rialo_last_eng'); if(!v) return alert('Please calculate engagement first'); const data=JSON.parse(v); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='engagement-proofs.json'; a.click(); URL.revokeObjectURL(url); }
+    qs('#saveEng').onclick = ()=>{
+      const v = localStorage.getItem('rialo_last_eng'); if(!v) return toast('No recent calculation. Press Calculate first.'); const data = JSON.parse(v); const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_engagement_proof.json'; a.click(); URL.revokeObjectURL(url); toast('Engagement exported');
+    }
+    qs('#resetEng').onclick = ()=>{ inpViews.value=''; inpLikes.value=''; inpRTs.value=''; inpReplies.value=''; engVal.textContent='0%'; viewBar.style.width='0%'; viewText.textContent='0 / 10000 views'; localStorage.removeItem('rialo_last_eng'); toast('Engagement reset'); }
 
-    // Quiz rendering + play
+    // Quiz improvements: add reset and clarity
+    const quizQuestions = [
+      {q:'What role do you get after completing onboarding in #waiting-room?', opts:['@RialONE','@RialORBIT','@RialOPS'], a:0},
+      {q:'How many views needed to qualify for @RialORBIT?', opts:['1k','10k','100k'], a:1},
+      {q:'Which channel hosts weekly creator tasks?', opts:['#club-tasks','#general','#raids'], a:0}
+    ];
+
     function renderQuiz(){
       const container = qs('#quizList'); container.innerHTML='';
       quizQuestions.forEach((q,i)=>{
-        const el = document.createElement('div'); el.className='quiz';
-        el.innerHTML = `<div style="font-weight:700">Q${i+1}. ${esc(q.q)}</div>`;
+        const el=document.createElement('div'); el.className='quiz';
+        el.innerHTML = `<div style="font-weight:700">Q${i+1}. ${escapeHTML(q.q)}</div>`;
         q.opts.forEach((opt,oi)=>{
-          const btn = document.createElement('button'); btn.className='btn ghost'; btn.style.display='block'; btn.style.marginTop='8px'; btn.textContent = opt;
-          btn.onclick = ()=>{ playAnswer(i,oi,btn); };
-          el.appendChild(btn);
+          const b = document.createElement('button'); b.className='btn ghost'; b.style.display='block'; b.style.marginTop='8px'; b.textContent=opt; b.dataset.q=i; b.dataset.opt=oi;
+          b.onclick = ()=>{ answerQuiz(i,oi,b); };
+          el.appendChild(b);
         });
         container.appendChild(el);
       });
-      // score area
-      const scoreWrap = document.createElement('div'); scoreWrap.style.marginTop='10px'; scoreWrap.innerHTML = `<div class="small muted">Your quiz score: <span id="quizScore">0</span> / ${quizQuestions.length}</div><div style="margin-top:6px"><button id="exportScore" class="btn">Export Score</button></div>`;
+      const scoreWrap = document.createElement('div'); scoreWrap.style.marginTop='10px'; scoreWrap.innerHTML = `<div class="small muted">Your quiz score: <span id="quizScore">0</span> / ${quizQuestions.length}</div><div style="display:flex;gap:8px;margin-top:8px"><button id="exportScore" class="btn">Export Score</button><button id="resetQuiz" class="btn ghost">Reset Quiz</button></div>`;
       container.appendChild(scoreWrap);
-      qs('#exportScore').onclick = ()=>{ const score = Number(qs('#quizScore').textContent||0); const payload = {score, total:quizQuestions.length, ts:Date.now()}; const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_quiz_score.json'; a.click(); URL.revokeObjectURL(url); }
+      qs('#exportScore').onclick = exportQuizScore;
+      qs('#resetQuiz').onclick = resetQuiz;
     }
+
     const answered = {};
-    function playAnswer(qIdx,optIdx,btn){
-      if(answered[qIdx]) return; // one attempt per question
-      const correct = quizQuestions[qIdx].a;
-      const container = btn.parentElement;
-      if(optIdx===correct){ btn.style.background='linear-gradient(90deg,var(--accent),var(--accent-2))'; btn.style.color='white'; answered[qIdx]=1; } else { btn.style.background='#ef4444'; btn.style.color='white'; answered[qIdx]=0; }
-      // disable siblings
-      Array.from(container.querySelectorAll('button')).forEach(b=>b.disabled=true);
+    function answerQuiz(qIdx,optIdx,btn){ if(answered[qIdx]!==undefined) return; const correct = quizQuestions[qIdx].a; const parent = btn.parentElement; if(optIdx===correct){ btn.style.background='linear-gradient(90deg,var(--accent),var(--accent-2))'; btn.style.color='white'; answered[qIdx]=1; } else { btn.style.background= 'linear-gradient(90deg,#ef4444,#ff7b7b)'; btn.style.color='white'; answered[qIdx]=0; }
+      Array.from(parent.querySelectorAll('button')).forEach(b=>b.disabled=true);
+      // highlight correct answer
+      const correctBtn = parent.querySelector(`button[data-opt='${correct}']`);
+      if(correctBtn) correctBtn.style.outline='3px solid rgba(107,70,193,0.15)';
       updateQuizScore();
     }
     function updateQuizScore(){ const s = Object.values(answered).reduce((a,b)=>a+(b||0),0); if(qs('#quizScore')) qs('#quizScore').textContent = s; }
+    function exportQuizScore(){ const score = Number(qs('#quizScore').textContent||0); const payload = {score,total:quizQuestions.length,answers:answered,ts:Date.now()}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='rialo_quiz_score.json'; a.click(); URL.revokeObjectURL(url); toast('Quiz exported'); }
+    function resetQuiz(){ for(const k in answered) delete answered[k]; renderQuiz(); toast('Quiz reset'); }
 
-    // init
+    // help modal (simple alert for now)
+    qs('#helpBtn').onclick = ()=>{ alert('How it works:
+
+- Add tasks for #club-tasks, raids, challenges.
+- Mark tasks done to track weekly progress.
+- Use Engagement Calculator to compute engagement and save proof.
+- Play the mini-quiz and export your score to share with mods.
+- Export tasks JSON to share progress.'); }
+
+    // Init render
     render(); renderQuiz();
+
+    // small accessibility: focus first input
+    qs('#taskTitle').focus();
   </script>
 </body>
 </html>
